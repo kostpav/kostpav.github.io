@@ -29,7 +29,7 @@ let rainbow = new Rainbow();
 rainbow.setNumberRange(0, iCount - 1);
 
 
-const N = 1;
+const N = 2;
 
 
 switch (N) 
