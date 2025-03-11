@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+body{
+  overflow: hidden;
+  margin: 0;
+}
+</style>
+<body>
+
+
+ <script src="main.js"></script> 
+
+</body>
+
+<!--                                                           С заливкой шейдер
+m.onBeforeCompile = shader => {
+  shader.vertexShader = shader.vertexShader.replace(
+    `#include <common>`,
+    `#include <common>
+    attribute vec3 color;
+    varying vec3 vColor;
+  `
+  ).replace(
+    `#include <begin_vertex>`,
+    `#include <begin_vertex>
+    vColor = color;
+  `
+  );
+
+  shader.fragmentShader = shader.fragmentShader.replace(
+    `#include <common>`,
+    `#include <common>
+    varying vec3 vColor;
+  `
+  ).replace(
+    `vec4 diffuseColor = vec4( diffuse, opacity );`,
+    `vec4 diffuseColor = vec4(vColor, opacity);`
+  );
+};
+-->
+
+
+<!--                                               Без заливки с краями которые не просвечиваются
+m.defines = { USE_UV: "" };
+m.extensions = { derivatives: true };
+
+m.onBeforeCompile = shader => {
+  shader.vertexShader = shader.vertexShader.replace(
+    `#include <common>`,
+    `#include <common>
+    attribute vec3 color;
+    varying vec3 vColor;
+  `
+  ).replace(
+    `#include <begin_vertex>`,
+    `#include <begin_vertex>
+    vColor = color;
+  `
+  );
+
+  shader.fragmentShader = shader.fragmentShader
+    .replace(
+      `#include <common>`,
+      `#include <common>
+    varying vec3 vColor;
+    float edgeFactor(vec2 p){
+        vec2 grid = abs(fract(p - 0.5) - 0.5) / fwidth(p) / 2.0;
+        return min(grid.x, grid.y);
+    }
+  `
+    )
+    .replace(
+      `vec4 diffuseColor = vec4( diffuse, opacity );`,
+      `float a = edgeFactor(vUv);
+    vec3 c = mix(vColor, vec3(0), a);
+    vec4 diffuseColor = vec4(c, opacity);
+  `
+    );
+};
+-->
+
+
+</html>
