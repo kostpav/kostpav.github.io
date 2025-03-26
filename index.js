@@ -29,13 +29,13 @@ let rainbow = new Rainbow();
 rainbow.setNumberRange(0, iCount - 1);
 
 
-const N = 4;
+const N = 2;
 
 
 switch (N) 
 			{
 case 1: rainbow.setSpectrum("yellow", "orange", "red", "black");break;// fire smt
-case 2: rainbow.setSpectrum("cyan", "magenta", "yellow", "yellow");break; // CMYK core
+case 2: rainbow.setSpectrum("cyan", "magenta", "yellow", "black");break; // CMYK core
 case 3: rainbow.setSpectrum("white", "silver", "gray", "black");break;   //B&W with extra steps
 case 4: rainbow.setSpectrum("black", "gray", "silver", "white");break;//B&W with extra steps in reverse
 			}													
@@ -62,9 +62,6 @@ let m = new THREE.MeshBasicMaterial();
 g.setAttribute("color", new THREE.InstancedBufferAttribute(colors, 3));
 
 //VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//////////////////////////////VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-m.defines = { USE_UV: "" };
-m.extensions = { derivatives: true };
-
 m.onBeforeCompile = shader => {
   shader.vertexShader = shader.vertexShader.replace(
     `#include <common>`,
@@ -79,24 +76,15 @@ m.onBeforeCompile = shader => {
   `
   );
 
-  shader.fragmentShader = shader.fragmentShader
-    .replace(
-      `#include <common>`,
-      `#include <common>
+  shader.fragmentShader = shader.fragmentShader.replace(
+    `#include <common>`,
+    `#include <common>
     varying vec3 vColor;
-    float edgeFactor(vec2 p){
-        vec2 grid = abs(fract(p - 0.5) - 0.5) / fwidth(p) / 2.0;
-        return min(grid.x, grid.y);
-    }
   `
-    )
-    .replace(
-      `vec4 diffuseColor = vec4( diffuse, opacity );`,
-      `float a = edgeFactor(vUv);
-    vec3 c = mix(vColor, vec3(0), a);
-    vec4 diffuseColor = vec4(c, opacity);
-  `
-    );
+  ).replace(
+    `vec4 diffuseColor = vec4( diffuse, opacity );`,
+    `vec4 diffuseColor = vec4(vColor, opacity);`
+  );
 };
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^///////////////////////////////^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
