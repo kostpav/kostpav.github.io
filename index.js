@@ -23,7 +23,7 @@ document.body.appendChild(renderer.domElement);
 
 //////////////////////////////////////////////////////////////////
 // RainbowVis-JS
-let iCount = 50;
+let iCount = 30;
 
 let rainbow = new Rainbow();
 rainbow.setNumberRange(0, iCount - 1);
