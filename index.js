@@ -29,7 +29,7 @@ let rainbow = new Rainbow();
 rainbow.setNumberRange(0, iCount - 1);
 
 
-const N = 3;
+const N = 1;
 
 
 switch (N) 
@@ -62,6 +62,9 @@ let m = new THREE.MeshBasicMaterial();
 g.setAttribute("color", new THREE.InstancedBufferAttribute(colors, 3));
 
 //VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//////////////////////////////VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+m.defines = { USE_UV: "" };
+m.extensions = { derivatives: true };
+
 m.onBeforeCompile = shader => {
   shader.vertexShader = shader.vertexShader.replace(
     `#include <common>`,
@@ -76,15 +79,24 @@ m.onBeforeCompile = shader => {
   `
   );
 
-  shader.fragmentShader = shader.fragmentShader.replace(
-    `#include <common>`,
-    `#include <common>
+  shader.fragmentShader = shader.fragmentShader
+    .replace(
+      `#include <common>`,
+      `#include <common>
     varying vec3 vColor;
+    float edgeFactor(vec2 p){
+        vec2 grid = abs(fract(p - 0.5) - 0.5) / fwidth(p) / 2.0;
+        return min(grid.x, grid.y);
+    }
   `
-  ).replace(
-    `vec4 diffuseColor = vec4( diffuse, opacity );`,
-    `vec4 diffuseColor = vec4(vColor, opacity);`
-  );
+    )
+    .replace(
+      `vec4 diffuseColor = vec4( diffuse, opacity );`,
+      `float a = edgeFactor(vUv);
+    vec3 c = mix(vColor, vec3(0), a);
+    vec4 diffuseColor = vec4(c, opacity);
+  `
+    );
 };
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^///////////////////////////////^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
