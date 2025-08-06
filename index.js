@@ -23,7 +23,7 @@ document.body.appendChild(renderer.domElement);
 
 //////////////////////////////////////////////////////////////////
 // RainbowVis-JS
-let iCount = 30;
+let іCount = 30;
 
 let rainbow = new Rainbow();
 rainbow.setNumberRange(0, iCount - 1);
@@ -147,3 +147,4 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
 }
+
